@@ -108,7 +108,7 @@ def get_graph(image):
 
 if __name__ == "__main__":
     
-    image = read_image_from_pdf("data/ECG_STEMI antero-laterale.pdf")
+    image = read_image_from_pdf("data/001.pdf")
     cropped_image = crop_image(image, 6, 688, 2536, 1919)
     cropped_image.save("prova_crop.png")
     four_ecg_images = get_ECG_images(cropped_image)
