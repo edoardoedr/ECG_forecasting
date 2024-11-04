@@ -4,6 +4,8 @@ import io
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+from funzioni_prova import *
+
 
 class ECGExtractor:
     def __init__(self, document_path):
@@ -96,14 +98,13 @@ class ECGExtractor:
     
 if __name__ == '__main__':
     
-    pdf2image = ECGExtractor('data/ECG_STEMI antero-laterale.pdf')
+    pdf2image = ECGExtractor('data/001.pdf')
     dict_image = pdf2image.preprocess()
     
-    for nome, derivazione in dict_image.items():
-        
-        print(nome)
-        plt.imshow(derivazione)
-        plt.title(nome)
-        plt.show()
+    sfondo = iter_similarity()
+    
+    # sfondo = Image.open("sfondo.png")
+    differenze(pdf2image,sfondo)
+
     
     
