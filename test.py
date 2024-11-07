@@ -208,8 +208,6 @@ class SignalExtractor:
 
 
 
-
-
 import matplotlib.pyplot as plt
 import cv2 as cv
 
