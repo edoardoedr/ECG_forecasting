@@ -166,6 +166,17 @@ class SignalExtractor:
     
         return raw_signals
 
+    def plot_grafici(self,key,x_vals, y_vals):
+        plt.plot(x_vals, y_vals,'-o',label = f'{key}', linewidth=0.2,alpha=0.5,markersize=4)
+
+        plt.legend()
+        plt.grid(True)
+
+        plt.tight_layout()
+        plt.show()
+        
+
+
 def import_functions_export_data(key,ecg_image_data):
 
     ecg_image = Image(ecg_image_data)
@@ -179,10 +190,6 @@ def import_functions_export_data(key,ecg_image_data):
     for i, signal in enumerate(signals):
         x_vals = [point.x for point in signal]
         y_vals = [point.y for point in signal]
-        plt.plot(x_vals, y_vals,'-o',label = f'{key}', linewidth=0.2,alpha=0.5,markersize=4)
-
-    plt.legend()
-    plt.grid(True)
-
-    plt.tight_layout()
-    plt.show()
+        extractor.plot_grafici(key,x_vals, y_vals)
+        
+        

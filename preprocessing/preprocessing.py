@@ -216,6 +216,6 @@ if __name__ == '__main__':
     
 
     for key,image in risultato_finale.items():
-        print(type(image))
+        
         image = np.array(image)
         import_functions_export_data(key,image)
