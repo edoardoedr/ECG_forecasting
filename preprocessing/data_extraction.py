@@ -166,7 +166,15 @@ class SignalExtractor:
     
         return raw_signals
 
-    def plot_grafici(self,key,x_vals, y_vals):
+    def plot_grafici(self,key,x_vals, y_vals,ecg_image_data):
+        
+        plt.imshow(ecg_image_data, cmap='gray', aspect='auto')
+        plt.title('Segnali Estratti Sovrapposti all\'Immagine ECG Originale')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        
+        
+        
         plt.plot(x_vals, y_vals,'-o',label = f'{key}', linewidth=0.2,alpha=0.5,markersize=4)
 
         plt.legend()
@@ -182,14 +190,10 @@ def import_functions_export_data(key,ecg_image_data):
     ecg_image = Image(ecg_image_data)
     extractor = SignalExtractor(n=1)
     signals = extractor.extract_signals(ecg_image)
-    plt.imshow(ecg_image_data, cmap='gray', aspect='auto')
-    plt.title('Segnali Estratti Sovrapposti all\'Immagine ECG Originale')
-    plt.xlabel('X')
-    plt.ylabel('Y')
+    # plt.imshow(ecg_image_data)
+    # plt.show()
     # Sovrappone i segnali estratti sull'immagine originale
     for i, signal in enumerate(signals):
         x_vals = [point.x for point in signal]
         y_vals = [point.y for point in signal]
-        extractor.plot_grafici(key,x_vals, y_vals)
-        
-        
+        extractor.plot_grafici(key,x_vals, y_vals,ecg_image_data)
