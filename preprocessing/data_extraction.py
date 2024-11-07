@@ -6,8 +6,9 @@ from operator import itemgetter
 from typing import Iterable
 import numpy as np
 from scipy.signal import find_peaks
+import cv2 as cv
+import matplotlib.pyplot as plt
 
-# Definizione delle classi necessarie
 
 @dataclass
 class Point:
@@ -16,17 +17,11 @@ class Point:
     """
     x: int = field()
     y: int = field()
-
-# class DigitizationError(Exception):
-#     """
-#     Error occurred during digitization process.
-#     """
-#     pass
-
+    
 class Image:
     def __init__(self, data: np.ndarray):
         self.__data = data
-    
+        
     @property
     def width(self):
         return self.__data.shape[1]
@@ -37,7 +32,7 @@ class Image:
 
     def __getitem__(self, index):
         return self.__data[index]
-
+    
 class SignalExtractor:
     def __init__(self, n: int) -> None:
         self.__n = n
@@ -171,43 +166,23 @@ class SignalExtractor:
     
         return raw_signals
 
+def import_functions_export_data(key,ecg_image_data):
 
+    ecg_image = Image(ecg_image_data)
+    extractor = SignalExtractor(n=1)
+    signals = extractor.extract_signals(ecg_image)
+    plt.imshow(ecg_image_data, cmap='gray', aspect='auto')
+    plt.title('Segnali Estratti Sovrapposti all\'Immagine ECG Originale')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    # Sovrappone i segnali estratti sull'immagine originale
+    for i, signal in enumerate(signals):
+        x_vals = [point.x for point in signal]
+        y_vals = [point.y for point in signal]
+        plt.plot(x_vals, y_vals,'-o',label = f'{key}', linewidth=0.2,alpha=0.5,markersize=4)
 
+    plt.legend()
+    plt.grid(True)
 
-
-import matplotlib.pyplot as plt
-import cv2 as cv
-
-
-
-# Caricamento dell'immagine ECG dal file processed.png
-ecg_image_data = cv.imread('processed.png', cv.IMREAD_GRAYSCALE)
-# print(type(ecg_image_data))
-ecg_image = Image(ecg_image_data)
-
-# Inizializzazione del SignalExtractor
-extractor = SignalExtractor(n=1)
-
-# Estrazione dei segnali utilizzando l'immagine modificata
-signals = extractor.extract_signals(ecg_image)
-
-# Creazione dei plot per sovrapporre i segnali estratti sull'immagine originale
-plt.figure(figsize=(12, 8))
-
-# Mostra l'immagine originale
-plt.imshow(ecg_image_data, cmap='gray', aspect='auto')
-plt.title('Segnali Estratti Sovrapposti all\'Immagine ECG Originale')
-plt.xlabel('X')
-plt.ylabel('Y')
-
-# Sovrappone i segnali estratti sull'immagine originale
-for i, signal in enumerate(signals):
-    x_vals = [point.x for point in signal]
-    y_vals = [point.y for point in signal]
-    plt.plot(x_vals, y_vals,'-o', label=f'Segnale {i+1}', linewidth=0.2,alpha=0.5)
-
-plt.legend()
-plt.grid(True)
-
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
