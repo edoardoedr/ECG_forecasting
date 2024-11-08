@@ -129,7 +129,7 @@ class SignalExtractor:
         raw_signals = []
         
         # Soglia di distanza per considerare un punto estremamente distante dal suo intorno
-        soglia_distanza = 10  # Puoi regolare questa soglia in base alle tue esigenze
+        soglia_distanza = 100  # Puoi regolare questa soglia in base alle tue esigenze
         
 
         # Crea una lista vuota per i punti di ciascun segnale
@@ -150,14 +150,14 @@ class SignalExtractor:
             if drop_next:
                 drop_next = False
                 continue
-
+            # filtered_raw_s.append(p)
             if i > 0 and i < len(raw_s) - 1:
                 dist_precedente = abs(p.y - raw_s[i - 1].y)
                 dist_successiva = abs(p.y - raw_s[i + 1].y)
-                if dist_precedente < soglia_distanza:
+                if dist_precedente < soglia_distanza :
                     filtered_raw_s.append(p)
-                else:
-                    drop_next = True
+                # else:
+                #     drop_next = True
             else:
                 filtered_raw_s.append(p)
 

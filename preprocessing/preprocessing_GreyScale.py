@@ -30,19 +30,7 @@ class Background:
         pil_image_grayscale = pil_image_cropped.convert('L')
 
         return pil_image_grayscale
-
-    
-    def save_similarities (self, img1,img2):
-        array_img1 = np.array(img1)
-        array_img2 = np.array(img2)
-
-        # print(array_img2.shape)
-        tolleranza = 50000
-        # tolleranza = 0
-        differenza = np.linalg.norm(array_img1 - array_img2, axis=0) > tolleranza
-        nuova_immagine = np.where(differenza, 255, array_img1)
-
-        return nuova_immagine    
+  
     
     def calcola_pixel_comuni(self, array_immagini):
         stack = np.stack(array_immagini, axis=-1)
@@ -63,16 +51,13 @@ class Background:
             for combinazioni in range (contatore +1 ,num_campioni):
                 if(contatore < 10 and combinazioni < 10):
                     immagine1 = self.get_image_from_pdf(f'{self.path}/00{contatore}.pdf')
-                    immagine2 = self.get_image_from_pdf(f'{self.path}/00{combinazioni}.pdf')
                 if(contatore < 10 and combinazioni >= 10):
                     immagine1 = self.get_image_from_pdf(f'{self.path}/00{contatore}.pdf')
-                    immagine2 = self.get_image_from_pdf(f'{self.path}/0{combinazioni}.pdf')
                 if(contatore >= 10 and combinazioni >= 10):
                     immagine1 = self.get_image_from_pdf(f'{self.path}/0{contatore}.pdf')
-                    immagine2 = self.get_image_from_pdf(f'{self.path}/0{combinazioni}.pdf')
 
-                repo_imgs.append(self.save_similarities(immagine1,immagine2))
-        array_immagini = [np.array(immagine) for immagine in repo_imgs]       
+                repo_imgs.append(immagine1)
+        array_immagini = [np.array(immagine) for immagine in repo_imgs]
         return array_immagini
     
     
@@ -120,21 +105,16 @@ class Rimozione_sfondo_e_tagli:
         array_seconda = np.array(seconda_immagine)
 
         
-        soglia = 127
+        soglia = 128
 
         array_img1_bin = (array_prima > soglia).astype(np.uint8)
         array_img2_bin = (array_seconda > soglia).astype(np.uint8)
-    
-        # tolleranza =50000
-        # differenza = np.linalg.norm(array_img1_bin - array_img2_bin, axis = 0) > tolleranza
-        # nuova_immagine = np.where(differenza, array_img1_bin, 255 )
-        tolleranza = 0
-        differenza = np.abs(array_img1_bin - array_img2_bin) > tolleranza
-        # print(differenza.shape)
-        # plt.plot(differenza)
-        # plt.show()
-        # print(differenza)
-        nuova_immagine = np.where(differenza, array_img1_bin, 255)
+
+
+        differenza = np.abs(array_img1_bin - array_img2_bin)
+
+        nuova_immagine = np.where(differenza, array_img1_bin, 1)
+
         
         return Image.fromarray(nuova_immagine)
     
@@ -164,6 +144,11 @@ class Rimozione_sfondo_e_tagli:
                 crop_region[region] = cropped_region
              
             return crop_region
+        
+        
+    # def interpolazione(self,):
+        
+    #     return
         
         
     def stampa(self,images): 
