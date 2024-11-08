@@ -7,8 +7,6 @@ from PIL import Image
 import io
 import os
 from scipy.ndimage import convolve
-# from scipy.interpolate import interp1d
-# from sklearn.cluster import KMeans
 from scipy.ndimage import median_filter
 
 
@@ -16,7 +14,7 @@ class Background:
     def __init__(self, path):
         self.path = path
         
-    def get_image_from_pdf(self,document_path):
+    def get_image_from_pdf(self, document_path):
         self.document_path = document_path
         pdf_document = fitz.open(self.document_path)
         page = pdf_document[0]
@@ -25,29 +23,37 @@ class Background:
         base_image = pdf_document.extract_image(xref)
         image_bytes = base_image["image"]
         pil_image = Image.open(io.BytesIO(image_bytes))
-        pil_image_cropped = pil_image.crop((10, 690, 2540, 1900 ))
+        pil_image_cropped = pil_image.crop((10, 690, 2540, 1900))
         pdf_document.close()
         
-        return pil_image_cropped
+        # Converti l'immagine in scala di grigi
+        pil_image_grayscale = pil_image_cropped.convert('L')
+
+        return pil_image_grayscale
+
     
     def save_similarities (self, img1,img2):
         array_img1 = np.array(img1)
         array_img2 = np.array(img2)
+
+        # print(array_img2.shape)
         tolleranza = 50000
-        tolleranza = 0
-        differenza = np.linalg.norm(array_img1 - array_img2, axis=-1) > tolleranza
-        nuova_immagine = np.where(differenza[..., None], 255, array_img1)
+        # tolleranza = 0
+        differenza = np.linalg.norm(array_img1 - array_img2, axis=0) > tolleranza
+        nuova_immagine = np.where(differenza, 255, array_img1)
+
         return nuova_immagine    
     
-    def calcola_pixel_comuni(self,array_immagini):
+    def calcola_pixel_comuni(self, array_immagini):
         stack = np.stack(array_immagini, axis=-1)
         pixel_comuni = np.zeros(array_immagini[0].shape, dtype=np.uint8)
-        for canale in range(3):
-            canale_array = stack[:, :, canale, :]
-            canale_array_flat = canale_array.reshape(-1, canale_array.shape[-1])
-            mode = np.apply_along_axis(lambda x: np.bincount(x).argmax(), axis=1, arr=canale_array_flat)
-            pixel_comuni[:, :, canale] = mode.reshape(array_immagini[0].shape[:2])
-        return pixel_comuni   
+
+        stack_flat = stack.reshape(-1, stack.shape[-1])
+        mode = np.apply_along_axis(lambda x: np.bincount(x).argmax(), axis=1, arr=stack_flat)
+        pixel_comuni = mode.reshape(array_immagini[0].shape)
+        
+        return pixel_comuni
+
     
     
     def iter_similarity(self):
@@ -64,11 +70,7 @@ class Background:
                 if(contatore >= 10 and combinazioni >= 10):
                     immagine1 = self.get_image_from_pdf(f'{self.path}/0{contatore}.pdf')
                     immagine2 = self.get_image_from_pdf(f'{self.path}/0{combinazioni}.pdf')
-                
-                img_grayscale = immagine1.convert('L')
-                immagine1 = Image.merge('RGB', (img_grayscale, img_grayscale, img_grayscale))
-                img_grayscale = immagine2.convert('L')
-                immagine2 = Image.merge('RGB', (img_grayscale, img_grayscale, img_grayscale))
+
                 repo_imgs.append(self.save_similarities(immagine1,immagine2))
         array_immagini = [np.array(immagine) for immagine in repo_imgs]       
         return array_immagini
@@ -104,8 +106,7 @@ class Rimozione_sfondo_e_tagli:
             immagine1 = self.get_image_from_pdf(f'{self.path}/00{contatore}.pdf')
         else:
             immagine1 = self.get_image_from_pdf(f'{self.path}/0{contatore}.pdf')
-        img_grayscale = immagine1.convert('L')
-        immagine1 = Image.merge('RGB', (img_grayscale, img_grayscale, img_grayscale))
+        immagine1 = immagine1.convert('L')
         return immagine1
     
     
@@ -124,9 +125,16 @@ class Rimozione_sfondo_e_tagli:
         array_img1_bin = (array_prima > soglia).astype(np.uint8)
         array_img2_bin = (array_seconda > soglia).astype(np.uint8)
     
-        tolleranza =0
-        differenza = np.linalg.norm(array_img1_bin - array_img2_bin, axis=-1) > tolleranza
-        nuova_immagine = np.where(differenza[..., None], array_img1_bin, 255 )
+        # tolleranza =50000
+        # differenza = np.linalg.norm(array_img1_bin - array_img2_bin, axis = 0) > tolleranza
+        # nuova_immagine = np.where(differenza, array_img1_bin, 255 )
+        tolleranza = 0
+        differenza = np.abs(array_img1_bin - array_img2_bin) > tolleranza
+        # print(differenza.shape)
+        # plt.plot(differenza)
+        # plt.show()
+        # print(differenza)
+        nuova_immagine = np.where(differenza, array_img1_bin, 255)
         
         return Image.fromarray(nuova_immagine)
     
@@ -188,7 +196,7 @@ class Rimozione_sfondo_e_tagli:
         immagine1 = self.importa_file(contatore)
         img_no_bkgr= self.differenze(immagine1,sfondo)
         crop_dict = self.get_image_derivation(img_no_bkgr)
-        # self.stampa(crop_dict)
+        
         return crop_dict
         
 
@@ -201,6 +209,7 @@ if __name__ == '__main__':
     if not os.path.isfile(os.path.join("preprocessing", "sfondo.png")):
         repo_imgs = Background('data')
         sfondo= repo_imgs.workflow()
+        sfondo = sfondo.astype(np.uint8)
         Image.fromarray(sfondo).save('preprocessing/sfondo.png')
     else:
         sfondo = Image.open("preprocessing/sfondo.png")
