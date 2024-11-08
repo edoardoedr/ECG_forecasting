@@ -129,7 +129,7 @@ class SignalExtractor:
         raw_signals = []
         
         # Soglia di distanza per considerare un punto estremamente distante dal suo intorno
-        soglia_distanza = 100  # Puoi regolare questa soglia in base alle tue esigenze
+        soglia_distanza = 50  # Puoi regolare questa soglia in base alle tue esigenze
         
 
         # Crea una lista vuota per i punti di ciascun segnale
@@ -172,16 +172,29 @@ class SignalExtractor:
         plt.title('Segnali Estratti Sovrapposti all\'Immagine ECG Originale')
         plt.xlabel('X')
         plt.ylabel('Y')
-        
-        
-        
         plt.plot(x_vals, y_vals,'-o',label = f'{key}', linewidth=0.2,alpha=0.5,markersize=4)
-
         plt.legend()
         plt.grid(True)
-
         plt.tight_layout()
         plt.show()
+        
+    def interpolazione(self,lista1,lista2):
+        
+        # Converti le liste in array numpy
+        x = np.array(lista1)
+        y = np.array(lista2)
+        
+        # Crea un nuovo array con la spaziatura definita
+        x_new = np.arange(x.min(), x.max(), 0.1)
+        
+        # Esegui l'interpolazione
+        y_new = np.interp(x_new, x, y)
+        
+        return x_new, y_new
+        
+        
+        
+        
         
 
 
@@ -196,4 +209,7 @@ def import_functions_export_data(key,ecg_image_data):
     for i, signal in enumerate(signals):
         x_vals = [point.x for point in signal]
         y_vals = [point.y for point in signal]
+        
+        x_vals,y_vals = extractor.interpolazione(x_vals,y_vals)
+        
         extractor.plot_grafici(key,x_vals, y_vals,ecg_image_data)

@@ -146,35 +146,33 @@ class Rimozione_sfondo_e_tagli:
             return crop_region
         
         
-    # def interpolazione(self,):
-        
-    #     return
+
         
         
-    def stampa(self,images): 
-        # Numero di immagini
-        num_images = len(images)
-        # Numero di colonne desiderato
-        num_cols = 3
-        # Numero di righe necessario
-        num_rows = (num_images + num_cols - 1) // num_cols
+    # def stampa(self,images): 
+    #     # Numero di immagini
+    #     num_images = len(images)
+    #     # Numero di colonne desiderato
+    #     num_cols = 3
+    #     # Numero di righe necessario
+    #     num_rows = (num_images + num_cols - 1) // num_cols
 
-        # Creiamo la figura e gli assi
-        fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 10))
-        axes = axes.flatten()
+    #     # Creiamo la figura e gli assi
+    #     fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 10))
+    #     axes = axes.flatten()
 
-        # Visualizziamo ogni immagine in una cella della griglia
-        for ax, (name, image) in zip(axes, images.items()):
-            ax.imshow(image, cmap='gray')
-            ax.set_title(name)
-            ax.axis('off')
+    #     # Visualizziamo ogni immagine in una cella della griglia
+    #     for ax, (name, image) in zip(axes, images.items()):
+    #         ax.imshow(image, cmap='gray')
+    #         ax.set_title(name)
+    #         ax.axis('off')
 
-        # Nascondiamo eventuali assi vuoti
-        for ax in axes[num_images:]:
-            ax.axis('off')
+    #     # Nascondiamo eventuali assi vuoti
+    #     for ax in axes[num_images:]:
+    #         ax.axis('off')
 
-        plt.tight_layout()
-        plt.show()
+    #     plt.tight_layout()
+    #     plt.show()
 
 
     def workflow(self,contatore,sfondo):
