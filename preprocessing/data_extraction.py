@@ -172,9 +172,9 @@ class SignalExtractor:
         plt.title('Segnali Estratti Sovrapposti all\'Immagine ECG Originale')
         plt.xlabel('X')
         plt.ylabel('Y')
-        plt.plot(x_vals, y_vals,'-o',label = f'{key}', linewidth=0.2,alpha=0.5,markersize=4)
+        plt.plot(x_vals, y_vals,'-',color = 'red',label = f'{key}', linewidth=1,alpha=1,markersize=4)
         plt.legend()
-        plt.grid(True)
+        plt.grid(False)
         plt.tight_layout()
         plt.show()
         
@@ -185,7 +185,7 @@ class SignalExtractor:
         y = np.array(lista2)
         
         # Crea un nuovo array con la spaziatura definita
-        x_new = np.arange(x.min(), x.max(), 0.1)
+        x_new = np.arange(0, x.max(), 0.1)
         
         # Esegui l'interpolazione
         y_new = np.interp(x_new, x, y)
@@ -198,7 +198,7 @@ class SignalExtractor:
         
 
 
-def import_functions_export_data(key,ecg_image_data):
+def import_functions_export_data(key,ecg_image_data,image_bkr):
 
     ecg_image = Image(ecg_image_data)
     extractor = SignalExtractor(n=1)
@@ -212,4 +212,5 @@ def import_functions_export_data(key,ecg_image_data):
         
         x_vals,y_vals = extractor.interpolazione(x_vals,y_vals)
         
-        extractor.plot_grafici(key,x_vals, y_vals,ecg_image_data)
+        # extractor.plot_grafici(key,x_vals, y_vals,ecg_image_data)
+        extractor.plot_grafici(key,x_vals, y_vals,image_bkr)

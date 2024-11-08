@@ -179,8 +179,9 @@ class Rimozione_sfondo_e_tagli:
         immagine1 = self.importa_file(contatore)
         img_no_bkgr= self.differenze(immagine1,sfondo)
         crop_dict = self.get_image_derivation(img_no_bkgr)
+        crop_dict_bkgr = self.get_image_derivation(immagine1)
         
-        return crop_dict
+        return crop_dict,crop_dict_bkgr
         
 
             
@@ -201,10 +202,10 @@ if __name__ == '__main__':
     immagine = Rimozione_sfondo_e_tagli('data')
     # for pdf in range(1,len([nome for nome in os.listdir('data') if os.path.isfile(os.path.join('data', nome))])+1):
     #     risultato_finale = immagine.workflow(pdf,sfondo)
-    risultato_finale = immagine.workflow(1,sfondo)
+    risultato_finale,immagine_con_background = immagine.workflow(1,sfondo)
     
 
-    for key,image in risultato_finale.items():
+    for (key,image),(key_bkr,image_bkr) in zip(risultato_finale.items(), immagine_con_background.items()):
         
         image = np.array(image)
-        import_functions_export_data(key,image)
+        import_functions_export_data(key,image,image_bkr)
