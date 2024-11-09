@@ -145,35 +145,6 @@ class Rimozione_sfondo_e_tagli:
                 crop_region[region] = cropped_region
              
             return crop_region
-        
-        
-
-        
-        
-    # def stampa(self,images): 
-    #     # Numero di immagini
-    #     num_images = len(images)
-    #     # Numero di colonne desiderato
-    #     num_cols = 3
-    #     # Numero di righe necessario
-    #     num_rows = (num_images + num_cols - 1) // num_cols
-
-    #     # Creiamo la figura e gli assi
-    #     fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 10))
-    #     axes = axes.flatten()
-
-    #     # Visualizziamo ogni immagine in una cella della griglia
-    #     for ax, (name, image) in zip(axes, images.items()):
-    #         ax.imshow(image, cmap='gray')
-    #         ax.set_title(name)
-    #         ax.axis('off')
-
-    #     # Nascondiamo eventuali assi vuoti
-    #     for ax in axes[num_images:]:
-    #         ax.axis('off')
-
-    #     plt.tight_layout()
-    #     plt.show()
 
 
     def workflow(self,contatore,sfondo):
@@ -185,9 +156,6 @@ class Rimozione_sfondo_e_tagli:
         return crop_dict,crop_dict_bkgr
         
 
-            
-            
-            
 
 if __name__ == '__main__':
     
@@ -205,7 +173,7 @@ if __name__ == '__main__':
     coordinate_x_y_di_ogni_campione =  {}
     
     # for pdf in range(1,len([nome for nome in os.listdir('data') if os.path.isfile(os.path.join('data', nome))])+1):
-    for pdf in range(2,3):
+    for pdf in range(1,3):
         risultato_finale, immagine_con_background = immagine.workflow(pdf,sfondo)
     # risultato_finale,immagine_con_background = immagine.workflow(1,sfondo)
         
