@@ -1,4 +1,5 @@
 from data_extraction import *
+from fine_background import *
 # import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -200,12 +201,26 @@ if __name__ == '__main__':
 
 
     immagine = Rimozione_sfondo_e_tagli('data')
-    # for pdf in range(1,len([nome for nome in os.listdir('data') if os.path.isfile(os.path.join('data', nome))])+1):
-    #     risultato_finale = immagine.workflow(pdf,sfondo)
-    risultato_finale,immagine_con_background = immagine.workflow(1,sfondo)
     
-
-    for (key,image),(key_bkr,image_bkr) in zip(risultato_finale.items(), immagine_con_background.items()):
+    coordinate_x_y_di_ogni_campione =  {}
+    
+    # for pdf in range(1,len([nome for nome in os.listdir('data') if os.path.isfile(os.path.join('data', nome))])+1):
+    for pdf in range(2,3):
+        risultato_finale, immagine_con_background = immagine.workflow(pdf,sfondo)
+    # risultato_finale,immagine_con_background = immagine.workflow(1,sfondo)
         
-        image = np.array(image)
-        import_functions_export_data(key,image,image_bkr)
+        for (key,image),(key_bkr,image_bkr) in zip(risultato_finale.items(), immagine_con_background.items()):
+            
+            nuovo_dizionario = {}
+            
+            image = np.array(image)
+            x_val,y_val = import_functions_export_data(key,image,image_bkr)
+            # nuovo_sfondo = Rimozione_ordini_superiori()
+            # nuovo_sfondo.workflow()
+            
+            
+            
+        #     nuovo_dizionario = {chiave: (x_val.tolist(),y_val.tolist()) for chiave in risultato_finale.keys()}
+        # coordinate_x_y_di_ogni_campione[f'{pdf}'] =nuovo_dizionario
+    
+    

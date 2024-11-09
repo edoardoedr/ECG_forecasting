@@ -129,7 +129,7 @@ class SignalExtractor:
         raw_signals = []
         
         # Soglia di distanza per considerare un punto estremamente distante dal suo intorno
-        soglia_distanza = 50  # Puoi regolare questa soglia in base alle tue esigenze
+        soglia_distanza = 100  # Puoi regolare questa soglia in base alle tue esigenze
         
 
         # Crea una lista vuota per i punti di ciascun segnale
@@ -214,3 +214,4 @@ def import_functions_export_data(key,ecg_image_data,image_bkr):
         
         # extractor.plot_grafici(key,x_vals, y_vals,ecg_image_data)
         extractor.plot_grafici(key,x_vals, y_vals,image_bkr)
+        return x_vals,y_vals
