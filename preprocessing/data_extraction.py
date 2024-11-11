@@ -166,6 +166,87 @@ class SignalExtractor:
     
         return raw_signals
 
+# -----------------------------------------------
+    # def __backtracking(self, cache: dict) -> Iterable[Iterable[Point]]:
+    #     """
+    #     Performs a backtracking process over the cache of links between clusters
+    #     to extract the signals.
+
+    #     Args:
+    #         cache (dict): Cache with the links between clusters.
+    #         rois (Iterable[int]): List with the row coordinates of the rois.
+
+    #     Returns:
+    #         Iterable[Iterable[Point]]: List with the list of points of each signal.
+    #     """
+    #     X_COORD, CLUSTER = (0, 1)  # Cache keys
+    #     Y_COORD, PREV, LEN = (0, 1, 2)  # Cache values
+    #     mean = lambda cluster: (cluster[0] + cluster[-1]) / 2
+    #     raw_signals = [None] * self.__n
+    #     # for roi_i in range(self.__n):
+    #     roi_i = 0
+    #     # Get candidate points (max signal length)
+    #     roi = 0
+    #     max_len = max([v[roi_i][LEN] for v in cache.values()])
+    #     cand_nodes = [list(cache.values())[-1][0][1]]
+    #     # print(cand_nodes)
+        
+    #     # Best last point is the one more closer to ROI
+    #     best = min(
+    #         cand_nodes,
+    #         key=lambda node: abs(ceil(mean(node[CLUSTER]))),
+    #     )
+        
+    #     # print(list(cache))
+        
+    #     # cache = {chiave: valore for chiave, valore in cache.items() if None not in valore[0]}
+    #     # for chiave, valore in cache.items(): print(f'{chiave}: {valore}, {valore[0]}')
+        
+    #     raw_s = []
+    #     clusters = []
+
+    #     for key, value in cache.items():
+    #         # Ottieni la coordinata X dalla chiave
+    #         x_coord = key[0]
+    #         # Ottieni la coordinata Y dal valore
+    #         y_coord = value[0][0]
+    #         # Aggiungi il punto alla lista
+    #         raw_s.append(Point(x_coord, y_coord))
+    #         # 
+    #         # if(key[CLUSTER] is not None):
+    #         clusters.append(key[CLUSTER]) 
+    #             # print(key[CLUSTER])
+    #             # print(key[CLUSTER])
+    #             # best = 
+    #     clusters = list(reversed(clusters))
+    #     raw_s = list(reversed(raw_s))
+
+            
+    #     raw_s = list(reversed(raw_s))
+    #     clusters = list(reversed(clusters))
+        
+        
+    #     # Peak delineation
+    #     roi_dist = [abs(p.y) for p in raw_s]
+    #     peaks, _ = find_peaks(roi_dist)
+        
+    #     for p in peaks:
+            
+    #         cluster = clusters[p - 1]
+    #         farthest = max(cluster, key=lambda x: abs(x))
+    #         raw_s[p] = Point(raw_s[p].x, farthest)
+    #     raw_signals[0] = raw_s
+            
+            
+    #     return raw_signals
+
+# -----------------------------------------------
+
+
+
+
+
+
     def plot_grafici(self,key,x_vals, y_vals,ecg_image_data):
         
         plt.imshow(ecg_image_data, cmap='gray', aspect='auto')

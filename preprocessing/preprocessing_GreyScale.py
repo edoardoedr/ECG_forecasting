@@ -1,6 +1,6 @@
 from data_extraction import *
-from fine_background import *
-# import cv2
+# from fine_background import *
+import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import fitz  # PyMuPDF
@@ -95,29 +95,59 @@ class Rimozione_sfondo_e_tagli:
         immagine1 = immagine1.convert('L')
         return immagine1
     
+    def trasformata(self,array,soglia):
+        f = np.fft.fft2(array)
+        fshift = np.fft.fftshift(f)
+        magnitude_spectrum = 20 * np.log(np.abs(fshift))
+
+        # Definisci la maschera per rimuovere una parte delle componenti di frequenza
+        rows, cols = array.shape
+        crow, ccol = rows // 2 , cols // 2  # Centro dell'immagine
+
+        # Crea una maschera con un quadrato centrale di basse frequenze
+        mask = np.ones((rows, cols), np.uint8)
+        r = soglia  # Raggio del quadrato centrale
+        mask[crow-r:crow+r, ccol-r:ccol+r] = 0
+
+        # Applica la maschera alle componenti di frequenza
+        fshift_masked = fshift * mask
+
+        # Calcola l'IFFT per ottenere l'immagine modificata
+        f_ishift = np.fft.ifftshift(fshift_masked)
+        img_back = np.fft.ifft2(f_ishift)
+        img_back = np.abs(img_back)
+        soglia = 128
+        img_back = (img_back > soglia).astype(np.uint8)
+        # img_back_inv = cv2.bitwise_not(img_back)
+        img_back_inv = 1 - img_back
+        return img_back_inv
+    
+
+
+    
+    
     
     def differenze(self,immagine,sfondo):
-        
-        prima_immagine = immagine
-        seconda_immagine = sfondo
-        
-
-        array_prima = np.array(prima_immagine)
-        array_seconda = np.array(seconda_immagine)
 
         
-        soglia = 128
+        array_prima = np.array(immagine)
+        array_seconda = np.array(sfondo)
 
-        array_img1_bin = (array_prima > soglia).astype(np.uint8)
-        array_img2_bin = (array_seconda > soglia).astype(np.uint8)
-
-
-        differenza = np.abs(array_img1_bin - array_img2_bin)
-
-        nuova_immagine = np.where(differenza, array_img1_bin, 1)
-
+        img_back_1 = self.trasformata(array_prima,1)
+       
+        img_back_2 = self.trasformata(array_seconda,1)
         
+                
+        
+
+        nuova_immagine= img_back_1.copy() 
+        nuova_immagine[img_back_2 == 0] = 1
+
         return Image.fromarray(nuova_immagine)
+        
+
+        
+        
     
     
 
