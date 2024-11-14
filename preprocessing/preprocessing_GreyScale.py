@@ -1,5 +1,5 @@
 from data_extraction import *
-# from fine_background import *
+# from pt_background import *
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,7 +38,8 @@ class Background:
         pixel_comuni = np.zeros(array_immagini[0].shape, dtype=np.uint8)
 
         stack_flat = stack.reshape(-1, stack.shape[-1])
-        mode = np.apply_along_axis(lambda x: np.bincount(x).argmax(), axis=1, arr=stack_flat)
+        threshold = len(array_immagini) // 4
+        mode = np.apply_along_axis(lambda x: np.bincount(x).argmax() if np.bincount(x).max() > threshold else 255, axis=1, arr=stack_flat)
         pixel_comuni = mode.reshape(array_immagini[0].shape)
         
         return pixel_comuni
@@ -137,11 +138,12 @@ class Rimozione_sfondo_e_tagli:
        
         img_back_2 = self.trasformata(array_seconda,1)
         
-                
+        
         
 
         nuova_immagine= img_back_1.copy() 
         nuova_immagine[img_back_2 == 0] = 1
+
 
         return Image.fromarray(nuova_immagine)
         
