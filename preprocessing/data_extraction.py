@@ -34,8 +34,8 @@ class Image:
         return self.__data[index]
     
 class SignalExtractor:
-    def __init__(self, n: int) -> None:
-        self.__n = n
+    def __init__(self) -> None:
+        self.__n = 1
 
     def extract_signals(self, ecg: Image) -> Iterable[Iterable[Point]]:
         """
@@ -83,13 +83,8 @@ class SignalExtractor:
 
         # Backtracking
         raw_signals = self.__backtracking(cache)
+        
         return raw_signals
-
-
-
-
-
-
 
     def __get_clusters(self, ecg, col: Iterable[int]) -> Iterable[Iterable[int]]:
         BLACK = 0
@@ -110,11 +105,7 @@ class SignalExtractor:
             d = len(range(c_max + 1, pc_min))
         return d
 
-
-
-
-    def __backtracking(
-        self, cache: dict) -> Iterable[Iterable[Point]]:
+    def __backtracking(self, cache: dict) -> Iterable[Iterable[Point]]:
         """
         Performs a backtracking process over the cache of links between clusters
         to extract the signals.
@@ -131,7 +122,6 @@ class SignalExtractor:
         # Soglia di distanza per considerare un punto estremamente distante dal suo intorno
         soglia_distanza = 10  # Puoi regolare questa soglia in base alle tue esigenze
         
-
         # Crea una lista vuota per i punti di ciascun segnale
         raw_s = []
         for key, value in cache.items():
@@ -163,10 +153,9 @@ class SignalExtractor:
 
         raw_signals.append(filtered_raw_s)
 
-    
         return raw_signals
 
-    def plot_grafici(self,key,x_vals, y_vals,ecg_image_data):
+    def plot_grafici(self, key, x_vals, y_vals,ecg_image_data):
         
         plt.imshow(ecg_image_data, cmap='gray', aspect='auto')
         plt.title('Segnali Estratti Sovrapposti all\'Immagine ECG Originale')
