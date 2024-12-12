@@ -154,7 +154,8 @@ class DatasetCheckerCreator:
             signal_extractor_nstemi = SignalExtractor(nstemi_regions, self.soglia_distanza, self.interpolate, self.num_points)
             nstemi_signals = signal_extractor_nstemi.extract_signals()
             self.save_signals(nstemi_signals, nstemi_data_path)
-            self.save_info()
+        
+        self.save_info()
                       
     
 if __name__ == '__main__':
