@@ -29,7 +29,7 @@ class DatasetCheckerCreator:
         self.background_image = self._check_or_create_background()
         self.stemi_path, self.nstemi_path = self.join_data_path()
         self.stemi_data_path, self.nstemi_data_path = self._create_new_data_directories()
-        self.get_image_with_coordinates = partial(self._get_image_from_pdf, coordinates=self.coordinates)
+        self.get_image_u_coordinates = partial(self._get_image_from_pdf, coordinates=self.coordinates)
 
     def _get_image_from_pdf(self, document_path, coordinates):
         
@@ -97,7 +97,7 @@ class DatasetCheckerCreator:
         
         if not os.path.isfile(background_image_path):
             print("Background image not found. Creating background image...")
-            background_creator = Background(self.dataset_path, self.get_image_with_coordinates ,self.divisore_threshold)
+            background_creator = Background(self.dataset_path, self.get_image_u_coordinates ,self.divisore_threshold)
             background_image = background_creator.get_background()
             background_image_pil = Image.fromarray(background_image)
             background_image_pil.save(background_image_path)
@@ -122,14 +122,14 @@ class DatasetCheckerCreator:
         nstemi_data_path = [os.path.join(self.nstemi_data_path, os.path.splitext(os.path.basename(img_pth))[0] + '.pkl') for img_pth in nstemi_image_paths]
         
         for stemi_path, stemi_data_path in zip(stemi_image_paths, stemi_data_path):
-            stemi_image = PreprocessImage(stemi_path, self.get_image_with_coordinates ,self.background_image, self.soglia, self.raggio)
+            stemi_image = PreprocessImage(stemi_path, self.get_image_u_coordinates ,self.background_image, self.soglia, self.raggio)
             stemi_regions = stemi_image.get_derivation_images()
             signal_extractor_stemi = SignalExtractor(stemi_regions, self.soglia_distanza, self.interpolate, self.num_points)
             stemi_signals = signal_extractor_stemi.extract_signals()
             self.save_signals(stemi_signals, stemi_data_path)
             
         for nstemi_path, nstemi_data_path in zip(nstemi_image_paths, nstemi_data_path):
-            nstemi_image = PreprocessImage(nstemi_path, self.get_image_with_coordinates, self.background_image, self.soglia, self.raggio)
+            nstemi_image = PreprocessImage(nstemi_path, self.get_image_u_coordinates, self.background_image, self.soglia, self.raggio)
             nstemi_regions = nstemi_image.get_derivation_images()
             signal_extractor_nstemi = SignalExtractor(nstemi_regions, self.soglia_distanza, self.interpolate, self.num_points)
             nstemi_signals = signal_extractor_nstemi.extract_signals()
