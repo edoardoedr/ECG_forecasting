@@ -140,14 +140,14 @@ class SignalExtractor:
             if drop_next:
                 drop_next = False
                 continue
-
+            # filtered_raw_s.append(p)
             if i > 0 and i < len(raw_s) - 1:
                 dist_precedente = abs(p.y - raw_s[i - 1].y)
                 dist_successiva = abs(p.y - raw_s[i + 1].y)
-                if dist_precedente < soglia_distanza:
+                if dist_precedente < soglia_distanza :
                     filtered_raw_s.append(p)
-                else:
-                    drop_next = True
+                # else:
+                #     drop_next = True
             else:
                 filtered_raw_s.append(p)
 
@@ -161,20 +161,33 @@ class SignalExtractor:
         plt.title('Segnali Estratti Sovrapposti all\'Immagine ECG Originale')
         plt.xlabel('X')
         plt.ylabel('Y')
-        
-        
-        
-        plt.plot(x_vals, y_vals,'-o',label = f'{key}', linewidth=0.2,alpha=0.5,markersize=4)
-
+        plt.plot(x_vals, y_vals,'-',color = 'red',label = f'{key}', linewidth=1,alpha=1,markersize=4)
         plt.legend()
-        plt.grid(True)
-
+        plt.grid(False)
         plt.tight_layout()
         plt.show()
         
+    def interpolazione(self,lista1,lista2):
+        
+        # Converti le liste in array numpy
+        x = np.array(lista1)
+        y = np.array(lista2)
+        
+        # Crea un nuovo array con la spaziatura definita
+        x_new = np.arange(0, x.max(), 0.1)
+        
+        # Esegui l'interpolazione
+        y_new = np.interp(x_new, x, y)
+        
+        return x_new, y_new
+        
+        
+        
+        
+        
 
 
-def import_functions_export_data(key,ecg_image_data):
+def import_functions_export_data(key,ecg_image_data,image_bkr):
 
     ecg_image = Image(ecg_image_data)
     extractor = SignalExtractor(n=1)
@@ -185,4 +198,9 @@ def import_functions_export_data(key,ecg_image_data):
     for i, signal in enumerate(signals):
         x_vals = [point.x for point in signal]
         y_vals = [point.y for point in signal]
-        extractor.plot_grafici(key,x_vals, y_vals,ecg_image_data)
+        
+        x_vals,y_vals = extractor.interpolazione(x_vals,y_vals)
+        
+        # extractor.plot_grafici(key,x_vals, y_vals,ecg_image_data)
+        extractor.plot_grafici(key,x_vals, y_vals,image_bkr)
+        return x_vals,y_vals

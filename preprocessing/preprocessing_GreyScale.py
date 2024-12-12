@@ -1,5 +1,6 @@
 from data_extraction import *
-# import cv2
+# from pt_background import *
+import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import fitz  # PyMuPDF
@@ -30,26 +31,15 @@ class Background:
         pil_image_grayscale = pil_image_cropped.convert('L')
 
         return pil_image_grayscale
-
-    
-    def save_similarities (self, img1,img2):
-        array_img1 = np.array(img1)
-        array_img2 = np.array(img2)
-
-        # print(array_img2.shape)
-        tolleranza = 50000
-        # tolleranza = 0
-        differenza = np.linalg.norm(array_img1 - array_img2, axis=0) > tolleranza
-        nuova_immagine = np.where(differenza, 255, array_img1)
-
-        return nuova_immagine    
+  
     
     def calcola_pixel_comuni(self, array_immagini):
         stack = np.stack(array_immagini, axis=-1)
         pixel_comuni = np.zeros(array_immagini[0].shape, dtype=np.uint8)
 
         stack_flat = stack.reshape(-1, stack.shape[-1])
-        mode = np.apply_along_axis(lambda x: np.bincount(x).argmax(), axis=1, arr=stack_flat)
+        threshold = len(array_immagini) // 4
+        mode = np.apply_along_axis(lambda x: np.bincount(x).argmax() if np.bincount(x).max() > threshold else 255, axis=1, arr=stack_flat)
         pixel_comuni = mode.reshape(array_immagini[0].shape)
         
         return pixel_comuni
@@ -63,16 +53,13 @@ class Background:
             for combinazioni in range (contatore +1 ,num_campioni):
                 if(contatore < 10 and combinazioni < 10):
                     immagine1 = self.get_image_from_pdf(f'{self.path}/00{contatore}.pdf')
-                    immagine2 = self.get_image_from_pdf(f'{self.path}/00{combinazioni}.pdf')
                 if(contatore < 10 and combinazioni >= 10):
                     immagine1 = self.get_image_from_pdf(f'{self.path}/00{contatore}.pdf')
-                    immagine2 = self.get_image_from_pdf(f'{self.path}/0{combinazioni}.pdf')
                 if(contatore >= 10 and combinazioni >= 10):
                     immagine1 = self.get_image_from_pdf(f'{self.path}/0{contatore}.pdf')
-                    immagine2 = self.get_image_from_pdf(f'{self.path}/0{combinazioni}.pdf')
 
-                repo_imgs.append(self.save_similarities(immagine1,immagine2))
-        array_immagini = [np.array(immagine) for immagine in repo_imgs]       
+                repo_imgs.append(immagine1)
+        array_immagini = [np.array(immagine) for immagine in repo_imgs]
         return array_immagini
     
     
@@ -109,34 +96,60 @@ class Rimozione_sfondo_e_tagli:
         immagine1 = immagine1.convert('L')
         return immagine1
     
+    def trasformata(self,array,soglia):
+        f = np.fft.fft2(array)
+        fshift = np.fft.fftshift(f)
+        magnitude_spectrum = 20 * np.log(np.abs(fshift))
+
+        # Definisci la maschera per rimuovere una parte delle componenti di frequenza
+        rows, cols = array.shape
+        crow, ccol = rows // 2 , cols // 2  # Centro dell'immagine
+
+        # Crea una maschera con un quadrato centrale di basse frequenze
+        mask = np.ones((rows, cols), np.uint8)
+        r = soglia  # Raggio del quadrato centrale
+        mask[crow-r:crow+r, ccol-r:ccol+r] = 0
+
+        # Applica la maschera alle componenti di frequenza
+        fshift_masked = fshift * mask
+
+        # Calcola l'IFFT per ottenere l'immagine modificata
+        f_ishift = np.fft.ifftshift(fshift_masked)
+        img_back = np.fft.ifft2(f_ishift)
+        img_back = np.abs(img_back)
+        soglia = 128
+        img_back = (img_back > soglia).astype(np.uint8)
+        # img_back_inv = cv2.bitwise_not(img_back)
+        img_back_inv = 1 - img_back
+        return img_back_inv
+    
+
+
+    
+    
     
     def differenze(self,immagine,sfondo):
-        
-        prima_immagine = immagine
-        seconda_immagine = sfondo
-        
-
-        array_prima = np.array(prima_immagine)
-        array_seconda = np.array(seconda_immagine)
 
         
-        soglia = 127
+        array_prima = np.array(immagine)
+        array_seconda = np.array(sfondo)
 
-        array_img1_bin = (array_prima > soglia).astype(np.uint8)
-        array_img2_bin = (array_seconda > soglia).astype(np.uint8)
-    
-        # tolleranza =50000
-        # differenza = np.linalg.norm(array_img1_bin - array_img2_bin, axis = 0) > tolleranza
-        # nuova_immagine = np.where(differenza, array_img1_bin, 255 )
-        tolleranza = 0
-        differenza = np.abs(array_img1_bin - array_img2_bin) > tolleranza
-        # print(differenza.shape)
-        # plt.plot(differenza)
-        # plt.show()
-        # print(differenza)
-        nuova_immagine = np.where(differenza, array_img1_bin, 255)
+        img_back_1 = self.trasformata(array_prima,1)
+       
+        img_back_2 = self.trasformata(array_seconda,1)
         
+        
+        
+
+        nuova_immagine= img_back_1.copy() 
+        nuova_immagine[img_back_2 == 0] = 1
+
+
         return Image.fromarray(nuova_immagine)
+        
+
+        
+        
     
     
 
@@ -164,45 +177,17 @@ class Rimozione_sfondo_e_tagli:
                 crop_region[region] = cropped_region
              
             return crop_region
-        
-        
-    def stampa(self,images): 
-        # Numero di immagini
-        num_images = len(images)
-        # Numero di colonne desiderato
-        num_cols = 3
-        # Numero di righe necessario
-        num_rows = (num_images + num_cols - 1) // num_cols
-
-        # Creiamo la figura e gli assi
-        fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 10))
-        axes = axes.flatten()
-
-        # Visualizziamo ogni immagine in una cella della griglia
-        for ax, (name, image) in zip(axes, images.items()):
-            ax.imshow(image, cmap='gray')
-            ax.set_title(name)
-            ax.axis('off')
-
-        # Nascondiamo eventuali assi vuoti
-        for ax in axes[num_images:]:
-            ax.axis('off')
-
-        plt.tight_layout()
-        plt.show()
 
 
     def workflow(self,contatore,sfondo):
         immagine1 = self.importa_file(contatore)
         img_no_bkgr= self.differenze(immagine1,sfondo)
         crop_dict = self.get_image_derivation(img_no_bkgr)
+        crop_dict_bkgr = self.get_image_derivation(immagine1)
         
-        return crop_dict
+        return crop_dict,crop_dict_bkgr
         
 
-            
-            
-            
 
 if __name__ == '__main__':
     
@@ -216,12 +201,26 @@ if __name__ == '__main__':
 
 
     immagine = Rimozione_sfondo_e_tagli('data')
-    # for pdf in range(1,len([nome for nome in os.listdir('data') if os.path.isfile(os.path.join('data', nome))])+1):
-    #     risultato_finale = immagine.workflow(pdf,sfondo)
-    risultato_finale = immagine.workflow(1,sfondo)
     
-
-    for key,image in risultato_finale.items():
+    coordinate_x_y_di_ogni_campione =  {}
+    
+    # for pdf in range(1,len([nome for nome in os.listdir('data') if os.path.isfile(os.path.join('data', nome))])+1):
+    for pdf in range(1,3):
+        risultato_finale, immagine_con_background = immagine.workflow(pdf,sfondo)
+    # risultato_finale,immagine_con_background = immagine.workflow(1,sfondo)
         
-        image = np.array(image)
-        import_functions_export_data(key,image)
+        for (key,image),(key_bkr,image_bkr) in zip(risultato_finale.items(), immagine_con_background.items()):
+            
+            nuovo_dizionario = {}
+            
+            image = np.array(image)
+            x_val,y_val = import_functions_export_data(key,image,image_bkr)
+            # nuovo_sfondo = Rimozione_ordini_superiori()
+            # nuovo_sfondo.workflow()
+            
+            
+            
+        #     nuovo_dizionario = {chiave: (x_val.tolist(),y_val.tolist()) for chiave in risultato_finale.keys()}
+        # coordinate_x_y_di_ogni_campione[f'{pdf}'] =nuovo_dizionario
+    
+    
