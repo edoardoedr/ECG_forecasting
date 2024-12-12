@@ -55,6 +55,26 @@ class DatasetCheckerCreator:
         os.makedirs(nstemi_data_path, exist_ok=True)
         
         return stemi_data_path, nstemi_data_path
+    
+    def save_info(self):
+        stemi_count = len(os.listdir(self.stemi_data_path))
+        nstemi_count = len(os.listdir(self.nstemi_data_path))
+        info = (
+            f"Number of STEMI ECGs: {stemi_count}\n"
+            f"Number of NSTEMI ECGs: {nstemi_count}\n"
+            f"Parameters used:\n"
+            f"  divisore_threshold: {self.divisore_threshold}\n"
+            f"  soglia: {self.soglia}\n"
+            f"  raggio: {self.raggio}\n"
+            f"  soglia_distanza: {self.soglia_distanza}\n"
+            f"  interpolate: {self.interpolate}\n"
+            f"  num_points: {self.num_points}\n"
+            f"  coordinates_pdf: {self.coordinates_pdf}\n"
+        )
+        info_path = os.path.join(self.dataset_path, 'info.txt')
+        with open(info_path, 'w') as file:
+            file.write(info)
+        print(f"Info saved to {info_path}")
         
     def _check_structure(self):
         if not os.path.isdir(self.dataset_path):
@@ -134,6 +154,7 @@ class DatasetCheckerCreator:
             signal_extractor_nstemi = SignalExtractor(nstemi_regions, self.soglia_distanza, self.interpolate, self.num_points)
             nstemi_signals = signal_extractor_nstemi.extract_signals()
             self.save_signals(nstemi_signals, nstemi_data_path)
+            self.save_info()
                       
     
 if __name__ == '__main__':
