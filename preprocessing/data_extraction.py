@@ -189,8 +189,10 @@ class SignalExtractor:
 
 def import_functions_export_data(key,ecg_image_data,image_bkr):
 
+    print(type(ecg_image_data))
     ecg_image = Image(ecg_image_data)
-    extractor = SignalExtractor(n=1)
+    extractor = SignalExtractor()
+    # print(type(ecg_image))
     signals = extractor.extract_signals(ecg_image)
     # plt.imshow(ecg_image_data)
     # plt.show()

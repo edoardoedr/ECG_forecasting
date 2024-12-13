@@ -205,7 +205,7 @@ if __name__ == '__main__':
     coordinate_x_y_di_ogni_campione =  {}
     
     # for pdf in range(1,len([nome for nome in os.listdir('data') if os.path.isfile(os.path.join('data', nome))])+1):
-    for pdf in range(1,3):
+    for pdf in range(1,2):
         risultato_finale, immagine_con_background = immagine.workflow(pdf,sfondo)
     # risultato_finale,immagine_con_background = immagine.workflow(1,sfondo)
         
