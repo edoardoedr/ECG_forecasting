@@ -5,6 +5,7 @@ import io
 import os
 from PIL import Image
 from DatasetCreationTools import PreprocessImage, SignalExtractor, Background, Config
+import matplotlib.pyplot as plt
 
 class DatasetCheckerCreator:
     def __init__(self, 
@@ -15,7 +16,8 @@ class DatasetCheckerCreator:
                  soglia_distanza = 10,
                  interpolate = False,
                  num_points = None,
-                 coordinates_pdf = (10, 690, 2540, 1900)):
+                 coordinates_pdf = (10, 690, 2540, 1900),
+                 debug = False):
         
         self.dataset_path = os.path.abspath(dataset_path)
         self.divisore_threshold = divisore_threshold
@@ -26,6 +28,7 @@ class DatasetCheckerCreator:
         self.num_points = num_points
         self.coordinates_pdf = coordinates_pdf
         self.get_image_u_coordinates = partial(self._get_image_from_pdf, coordinates=self.coordinates_pdf)
+        self.debug = debug
         assert self._check_structure()
         self.background_image = self._check_or_create_background()
         self.stemi_path, self.nstemi_path = self.join_data_path()
@@ -134,6 +137,25 @@ class DatasetCheckerCreator:
 
         with open(file_path, 'wb') as file:
             pickle.dump(data, file)
+            
+    def plot_and_compare(self, ecg_signal, ecg_image, save_path):
+        
+        num_keys = 12 # 12 derivazioni
+        fig, axes = plt.subplots(num_keys, 1, figsize=(10, 5 * num_keys))
+        
+        for ax, key in zip(axes, ecg_signal.keys()):
+            x_vals, y_vals = ecg_signal[key]
+            ax.imshow(ecg_image[key], cmap='gray', aspect='auto')
+            ax.set_title(f'Segnali Estratti Sovrapposti all\'Immagine ECG Originale - {key}')
+            ax.set_xlabel('X')
+            ax.set_ylabel('Y')
+            ax.plot(x_vals, y_vals, '-', color='red', label=f'{key}', linewidth=1, alpha=1, markersize=4)
+            ax.legend()
+            ax.grid(False)
+        
+        plt.tight_layout()
+        plt.savefig(save_path)
+        plt.close()
 
     def process_derivation(self):
         
@@ -143,17 +165,27 @@ class DatasetCheckerCreator:
         nstemi_data_path = [os.path.join(self.nstemi_data_path, os.path.splitext(os.path.basename(img_pth))[0] + '.pkl') for img_pth in nstemi_image_paths]
         
         for stemi_path, stemi_data_path in zip(stemi_image_paths, stemi_data_path):
-            stemi_image = PreprocessImage(stemi_path, self.get_image_u_coordinates ,self.background_image, self.soglia, self.raggio)
-            stemi_regions = stemi_image.get_derivation_images()
+            stemi_image = PreprocessImage(stemi_path, self.get_image_u_coordinates ,self.background_image, self.soglia, self.raggio, self.debug)
+            if self.debug:
+                stemi_regions, stemi_regions_bg = stemi_image.get_derivation_images()
+            else:
+                stemi_regions = stemi_image.get_derivation_images()
             signal_extractor_stemi = SignalExtractor(stemi_regions, self.soglia_distanza, self.interpolate, self.num_points)
             stemi_signals = signal_extractor_stemi.extract_signals()
+            if self.debug:
+                self.plot_and_compare(stemi_signals, stemi_regions_bg, stemi_data_path.replace('.pkl', '.png'))
             self.save_signals(stemi_signals, stemi_data_path)
             
         for nstemi_path, nstemi_data_path in zip(nstemi_image_paths, nstemi_data_path):
-            nstemi_image = PreprocessImage(nstemi_path, self.get_image_u_coordinates, self.background_image, self.soglia, self.raggio)
-            nstemi_regions = nstemi_image.get_derivation_images()
+            nstemi_image = PreprocessImage(nstemi_path, self.get_image_u_coordinates, self.background_image, self.soglia, self.raggio, self.debug)
+            if self.debug:
+                nstemi_regions, nstemi_regions_bg = stemi_image.get_derivation_images()
+            else:
+                nstemi_regions = nstemi_image.get_derivation_images()
             signal_extractor_nstemi = SignalExtractor(nstemi_regions, self.soglia_distanza, self.interpolate, self.num_points)
             nstemi_signals = signal_extractor_nstemi.extract_signals()
+            if self.debug:
+                self.plot_and_compare(nstemi_signals, nstemi_regions_bg, nstemi_data_path.replace('.pkl', '.png'))  
             self.save_signals(nstemi_signals, nstemi_data_path)
         
         self.save_info()

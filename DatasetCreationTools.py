@@ -52,11 +52,12 @@ class Background:
         return sfondo.astype(np.uint8)
     
 class PreprocessImage:
-    def __init__(self, pdf_path, get_image_from_pdf, background_image, soglia = 128, raggio = 1):
+    def __init__(self, pdf_path, get_image_from_pdf, background_image, soglia = 128, raggio = 1, debug = False):
         self.image_ecg = get_image_from_pdf(pdf_path)
         self.background = background_image
         self.soglia = soglia
         self.raggio = raggio
+        self.debug = debug
 
     def get_image_fft(self, image_np):
         
@@ -116,7 +117,7 @@ class PreprocessImage:
             "R3) aVF": (615, altezza*2, 1225, altezza*3+50),
             "R3) V3": (1230, altezza*2, 1840, altezza*3+50),
             "R3) V6": (1845, altezza*2, 2455, altezza*3+50),
-            "R4) IV derivazione": (0, altezza*3+50, 2454, altezza*4)
+            #"R4) IV derivazione": (0, altezza*3+50, 2454, altezza*4)
             }
                     
         crop_region = {}
@@ -131,7 +132,12 @@ class PreprocessImage:
         image_without_background = self.remove_bg_fft()
         image_without_background_cropped = self.crop_image_regions(image_without_background)
         
+        if self.debug:
+            image_ecg_cropped = self.crop_image_regions(self.image_ecg)
+            return image_without_background_cropped, image_ecg_cropped
+        
         return image_without_background_cropped
+
     
 @dataclass
 class Point:
