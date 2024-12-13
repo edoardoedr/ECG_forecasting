@@ -3,10 +3,8 @@ parameters:
   divisore_threshold: 4
   soglia: 128
   raggio: 1
-  soglia_distanza: 10
-  interpolate: False
-  num_points: null
+  soglia_distanza: 20
+  interpolate: True
+  num_points: 5000
   coordinates_pdf: [10, 690, 2540, 1900]
-  debug: False
-
-  # G:\Il mio Drive\Codici Python\ECG_forecasting\Dataset
+  debug: True

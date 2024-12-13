@@ -201,7 +201,8 @@ if __name__ == '__main__':
                                                     config.soglia_distanza, 
                                                     config.interpolate, 
                                                     config.num_points, 
-                                                    config.coordinates_pdf)
+                                                    config.coordinates_pdf,
+                                                    config.debug)
     
     dataset_checker_creator.process_derivation()
     print("Signals saved successfully!")
