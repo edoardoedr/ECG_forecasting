@@ -26,7 +26,7 @@ class Background:
             pdf_paths.extend(pdf_files)
             
             
-        sample_size = max(1, len(pdf_paths) // 1)
+        sample_size = max(10, len(pdf_paths) // 20)
         sampled_paths = random.sample(pdf_paths, sample_size)
         
         return sampled_paths
@@ -84,6 +84,7 @@ class PreprocessImage:
         
         return img_back_inv
     
+    # Removes the background from the ECG image using FFT.
     def remove_bg_fft(self):
 
         image_np = np.array(self.image_ecg)
@@ -94,10 +95,7 @@ class PreprocessImage:
         
         filtered_image_copy = filtered_image.copy() 
         filtered_image_copy[filtered_sfondo == 0] = 1
-        print("----------------------",type(filtered_image_copy))
-        print("----------------------",filtered_image_copy.dtype)
         filtered_image_copy = PILImage.fromarray(filtered_image_copy)
-        print("----------------------",type(filtered_image_copy))
 
         return filtered_image_copy
     
@@ -293,7 +291,7 @@ class SignalExtractor:
         y = np.array(y_signal)
         
         # Crea un nuovo array con il numero di punti definito
-        x_new = np.linspace(x.min(), x.max(), self.num_points)
+        x_new = np.linspace(x.min(), x.max(), self.__num_points)
         
         # Esegui l'interpolazione
         y_new = np.interp(x_new, x, y)
@@ -323,7 +321,7 @@ class Config:
         with open(config_file, 'r') as file:
             self.config = yaml.safe_load(file)
 
-    def get(self, section, key):
+    def get(self, section: str, key: str):
         """Restituisce il valore di una chiave nella sezione specificata."""
         return self.config.get(section, {}).get(key)
 
@@ -358,4 +356,8 @@ class Config:
     @property
     def coordinates_pdf(self):
         return tuple(self.get('parameters', 'coordinates_pdf'))
+    
+    @property
+    def debug(self):
+        return self.get('parameters', 'debug')
     

@@ -7,5 +7,6 @@ parameters:
   interpolate: False
   num_points: null
   coordinates_pdf: [10, 690, 2540, 1900]
+  debug: False
 
   # G:\Il mio Drive\Codici Python\ECG_forecasting\Dataset
