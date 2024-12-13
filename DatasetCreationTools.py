@@ -303,7 +303,10 @@ class SignalExtractor:
     def extract_signals(self):
         signals = {}
         for region, image in self.__ecg_image_dict.items():
-            signal_iterables = self.extract_single_signal(image)
+            obj_image = Image(np.array(image))
+            print(type(obj_image),image)
+            signal_iterables = self.extract_single_signal(obj_image)            
+            # signal_iterables = self.extract_single_signal(image)
             for signal in signal_iterables:
                 x_signal = [point.x for point in signal]
                 y_signal = [point.y for point in signal]
