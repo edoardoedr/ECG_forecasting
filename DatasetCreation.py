@@ -25,11 +25,12 @@ class DatasetCheckerCreator:
         self.interpolate = interpolate
         self.num_points = num_points
         self.coordinates_pdf = coordinates_pdf
+        self.get_image_u_coordinates = partial(self._get_image_from_pdf, coordinates=self.coordinates_pdf)
         assert self._check_structure()
         self.background_image = self._check_or_create_background()
         self.stemi_path, self.nstemi_path = self.join_data_path()
         self.stemi_data_path, self.nstemi_data_path = self._create_new_data_directories()
-        self.get_image_u_coordinates = partial(self._get_image_from_pdf, coordinates=self.coordinates)
+        
 
     def _get_image_from_pdf(self, document_path, coordinates):
         
@@ -159,7 +160,7 @@ class DatasetCheckerCreator:
                       
     
 if __name__ == '__main__':
-    config = Config('config.yml')
+    config = Config('config.yaml')
     
     dataset_checker_creator = DatasetCheckerCreator(config.data_path, 
                                                     config.divisore_threshold, 

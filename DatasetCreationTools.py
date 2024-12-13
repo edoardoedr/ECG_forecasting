@@ -1,5 +1,5 @@
 import os
-from PIL import Image
+from PIL import Image as PILImage
 import random
 import numpy as np
 from dataclasses import field, dataclass
@@ -10,7 +10,7 @@ from operator import itemgetter
 import yaml
 
 class Background:
-    def __init__(self, path, get_image_from_pdf: function, divisore_threshold = 4):
+    def __init__(self, path, get_image_from_pdf, divisore_threshold = 4):
         self.base_path = os.path.abspath(path)
         self.get_image_from_pdf = get_image_from_pdf
         self.random_pdf_paths = self.get_pdf_paths()
@@ -25,22 +25,11 @@ class Background:
             pdf_files = [os.path.join(subdir_path, f) for f in os.listdir(subdir_path) if f.endswith('.pdf')]
             pdf_paths.extend(pdf_files)
             
-        sample_size = max(1, len(pdf_paths) // 10)
-        sampled_paths = random.sample(pdf_paths, sample_size)
             
+        sample_size = max(1, len(pdf_paths) // 1)
+        sampled_paths = random.sample(pdf_paths, sample_size)
+        
         return sampled_paths
-
-    def iter_similarity(self):
-        
-        list_images = [self.get_image_from_pdf(pdf_path) for pdf_path in self.random_pdf_paths]
-        
-        similarities = []
-        for i in range(len(list_images)):
-            for j in range(i + 1, len(list_images)):
-                similarity = self._get_similarity(list_images[i], list_images[j])
-                similarities.append(similarity)
-    
-        return similarities
     
     def calcola_pixel_comuni(self, array_immagini):
         
@@ -57,13 +46,13 @@ class Background:
     
     def get_background(self):
         
-        array_immagini = self.iter_similarity()
+        array_immagini = [np.array(self.get_image_from_pdf(pdf_path)) for pdf_path in self.random_pdf_paths]
         sfondo = self.calcola_pixel_comuni(array_immagini)
         
         return sfondo.astype(np.uint8)
     
 class PreprocessImage:
-    def __init__(self, pdf_path, get_image_from_pdf: function, background_image, soglia = 128, raggio = 1):
+    def __init__(self, pdf_path, get_image_from_pdf, background_image, soglia = 128, raggio = 1):
         self.image_ecg = get_image_from_pdf(pdf_path)
         self.background = background_image
         self.soglia = soglia
@@ -105,8 +94,12 @@ class PreprocessImage:
         
         filtered_image_copy = filtered_image.copy() 
         filtered_image_copy[filtered_sfondo == 0] = 1
+        print("----------------------",type(filtered_image_copy))
+        print("----------------------",filtered_image_copy.dtype)
+        filtered_image_copy = PILImage.fromarray(filtered_image_copy)
+        print("----------------------",type(filtered_image_copy))
 
-        return Image.fromarray(filtered_image_copy)
+        return filtered_image_copy
     
     def crop_image_regions(self, image) -> dict:
             
@@ -227,7 +220,9 @@ class SignalExtractor:
     def __get_clusters(self, ecg, col: Iterable[int]) -> Iterable[Iterable[int]]:
         BLACK = 0
         clusters = []
+        
         black_p = np.where(ecg[:, col] == BLACK)[0]
+        
         for _, g in groupby(enumerate(black_p), lambda idx_val: idx_val[0] - idx_val[1]):
             clu = tuple(map(itemgetter(1), g))
             clusters.append(clu)

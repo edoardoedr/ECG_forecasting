@@ -1,5 +1,5 @@
 parameters:
-  data_path: /ECG_forecasting/Dataset
+  data_path: G:/Il mio Drive/Codici Python/ECG_forecasting/Dataset
   divisore_threshold: 4
   soglia: 128
   raggio: 1
@@ -7,3 +7,5 @@ parameters:
   interpolate: False
   num_points: null
   coordinates_pdf: [10, 690, 2540, 1900]
+
+  # G:\Il mio Drive\Codici Python\ECG_forecasting\Dataset
