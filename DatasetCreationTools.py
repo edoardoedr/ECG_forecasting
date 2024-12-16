@@ -1,5 +1,6 @@
 import os
-from PIL import Image as PILImage
+import cv2
+from PIL import Image as PILImage, ImageFilter
 import random
 import numpy as np
 from dataclasses import field, dataclass
@@ -8,6 +9,7 @@ from math import ceil
 from itertools import groupby
 from operator import itemgetter
 import yaml
+import matplotlib.pyplot as plt
 
 class Background:
     def __init__(self, path, get_image_from_pdf, divisore_threshold = 4):
@@ -31,6 +33,24 @@ class Background:
         
         return sampled_paths
     
+    # def sharpen_custom(self,array_immagini):
+    #     img = np.asarray(array_immagini)
+
+    #     # Applica il filtro Sobel per rilevare i bordi orizzontali e verticali
+    #     sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)
+    #     sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)
+
+    #     # Calcola la magnitudine dei gradienti
+    #     sobel = cv2.magnitude(sobelx, sobely)
+
+    #     # Converte l'immagine risultante in un formato adatto per la visualizzazione
+    #     sobel = np.uint8(np.absolute(sobel))
+        
+    #     return sobel
+    
+    
+    
+    
     def calcola_pixel_comuni(self, array_immagini):
         
         stack = np.stack(array_immagini, axis=-1)
@@ -47,6 +67,10 @@ class Background:
     def get_background(self):
         
         array_immagini = [np.array(self.get_image_from_pdf(pdf_path)) for pdf_path in self.random_pdf_paths]
+        
+        # sharpened_images = [np.array(self.sharpen_custom(PILImage.fromarray(image))) for image in array_immagini]
+        # for i in len(array_immagini): array_immagini[i] = self.sharpen_custom(array_immagini[i]) 
+        
         sfondo = self.calcola_pixel_comuni(array_immagini)
         
         return sfondo.astype(np.uint8)
@@ -86,9 +110,9 @@ class PreprocessImage:
         return img_back_inv
     
     # Removes the background from the ECG image using FFT.
-    def remove_bg_fft(self):
+    def remove_bg_fft(self, sharpened_image ):
 
-        image_np = np.array(self.image_ecg)
+        image_np = np.array(sharpened_image)
         background_np = np.array(self.background)
         
         filtered_image = self.get_image_fft(image_np)
@@ -127,9 +151,30 @@ class PreprocessImage:
              
         return crop_region
     
+    
+    # def sharpen_custom(self):
+    #     img = np.asarray(self.image_ecg)
+
+    #     # Applica il filtro Sobel per rilevare i bordi orizzontali e verticali
+    #     sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)
+    #     sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)
+
+    #     # Calcola la magnitudine dei gradienti
+    #     sobel = cv2.magnitude(sobelx, sobely)
+
+    #     # Converte l'immagine risultante in un formato adatto per la visualizzazione
+    #     sobel = np.uint8(np.absolute(sobel))
+        
+        
+        
+    #     return sobel
+    
+    
+    
     def get_derivation_images(self):
 
-        image_without_background = self.remove_bg_fft()
+        # sharpened_image = self.sharpen_custom()
+        image_without_background = self.remove_bg_fft(self.image_ecg)
         image_without_background_cropped = self.crop_image_regions(image_without_background)
         
         if self.debug:
@@ -137,6 +182,9 @@ class PreprocessImage:
             return image_without_background_cropped, image_ecg_cropped
         
         return image_without_background_cropped
+    
+    
+
 
     
 @dataclass

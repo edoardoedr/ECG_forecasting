@@ -6,6 +6,7 @@ import os
 from PIL import Image
 from DatasetCreationTools import PreprocessImage, SignalExtractor, Background, Config
 import matplotlib.pyplot as plt
+import shutil
 
 class DatasetCheckerCreator:
     def __init__(self, 
@@ -84,7 +85,14 @@ class DatasetCheckerCreator:
         if not os.path.isdir(self.dataset_path):
             raise ValueError(f"The path {self.dataset_path} is not a valid directory.")
         
+        
+        if os.path.isdir(os.path.join(self.dataset_path, "ECG NSTEMI_data")):
+            shutil.rmtree(os.path.join(self.dataset_path, "ECG NSTEMI_data"))
+        if os.path.isdir(os.path.join(self.dataset_path, "ECG STEMI_data")):
+            shutil.rmtree(os.path.join(self.dataset_path, "ECG STEMI_data"))
+        
         subdirs = [d for d in os.listdir(self.dataset_path) if os.path.isdir(os.path.join(self.dataset_path, d))]
+        
         
         if len(subdirs) != 2:
             raise ValueError("The dataset directory must contain exactly two subdirectories.")
