@@ -85,11 +85,12 @@ class DatasetCheckerCreator:
         if not os.path.isdir(self.dataset_path):
             raise ValueError(f"The path {self.dataset_path} is not a valid directory.")
         
-        
+        # CANCELLARE A FINE DEBUG
         if os.path.isdir(os.path.join(self.dataset_path, "ECG NSTEMI_data")):
             shutil.rmtree(os.path.join(self.dataset_path, "ECG NSTEMI_data"))
         if os.path.isdir(os.path.join(self.dataset_path, "ECG STEMI_data")):
             shutil.rmtree(os.path.join(self.dataset_path, "ECG STEMI_data"))
+        # ----------------------
         
         subdirs = [d for d in os.listdir(self.dataset_path) if os.path.isdir(os.path.join(self.dataset_path, d))]
         
