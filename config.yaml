@@ -1,5 +1,5 @@
 parameters:
-  data_path: G:/Il mio Drive/Codici Python/ECG_forecasting/Dataset
+  data_path: /home/sbartucci/ECG_forecasting/Dataset
   divisore_threshold: 4
   soglia: 128
   raggio: 1

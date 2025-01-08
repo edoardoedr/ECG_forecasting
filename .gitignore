@@ -7,3 +7,12 @@ altrecose/
 *.tif
 __pycache__/
 Dataset/
+ckpts/
+ECG_miner/
+fairseq-signals/
+Models/
+outputs/
+setup.sh
+*.yaml
+see_model.py
+test.py
