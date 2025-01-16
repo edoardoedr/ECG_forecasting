@@ -1,0 +1,4 @@
+parameters:
+  data_path: G:/Il mio Drive/Codici Python/ECG_forecasting/Dataset
+  n_seconds: 2.5
+  debug: True

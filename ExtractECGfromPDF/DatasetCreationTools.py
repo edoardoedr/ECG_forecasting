@@ -105,19 +105,19 @@ class PreprocessImage:
         altezza = image.size[1]//4
             
         crop_coordinates = {
-            "R1) I derivazione": (0, 0, 610, altezza),
-            "R1) aVR": (615, 0, 1225, altezza),
-            "R1) V1": (1230, 0, 1840, altezza),
-            "R1) V4": (1845, 0, 2455, altezza),
-            "R2) II derivazione": (0, altezza, 610, altezza*2),
-            "R2) aVL": (615, altezza, 1225, altezza*2),
-            "R2) V2": (1230, altezza, 1840, altezza*2),
-            "R2) V5": (1845, altezza, 2455, altezza*2),
-            "R3) III derivazione": (0, altezza*2, 610, altezza*3),
-            "R3) aVF": (615, altezza*2, 1225, altezza*3+50),
-            "R3) V3": (1230, altezza*2, 1840, altezza*3+50),
-            "R3) V6": (1845, altezza*2, 2455, altezza*3+50),
-            #"R4) IV derivazione": (0, altezza*3+50, 2454, altezza*4)
+            "I": (0, 0, 610, altezza),
+            "aVR": (615, 0, 1225, altezza),
+            "V1": (1230, 0, 1840, altezza),
+            "V4": (1845, 0, 2455, altezza),
+            "II": (0, altezza, 610, altezza*2),
+            "aVL": (615, altezza, 1225, altezza*2),
+            "V2": (1230, altezza, 1840, altezza*2),
+            "V5": (1845, altezza, 2455, altezza*2),
+            "III": (0, altezza*2, 610, altezza*3),
+            "aVF": (615, altezza*2, 1225, altezza*3+50),
+            "V3": (1230, altezza*2, 1840, altezza*3+50),
+            "V6": (1845, altezza*2, 2455, altezza*3+50),
+            #"IV": (0, altezza*3+50, 2454, altezza*4)
             }
                     
         crop_region = {}

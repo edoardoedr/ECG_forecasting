@@ -4,7 +4,7 @@ import fitz
 import io
 import os
 from PIL import Image
-from DatasetCreationTools import PreprocessImage, SignalExtractor, Background, Config
+from .DatasetCreationTools import PreprocessImage, SignalExtractor, Background, Config
 import matplotlib.pyplot as plt
 
 class DatasetCheckerCreator:
@@ -159,8 +159,8 @@ class DatasetCheckerCreator:
 
     def process_derivation(self):
         
-        stemi_image_paths = [os.path.join(self.stemi_path, img_pth) for img_pth in os.listdir(self.stemi_path)]
-        nstemi_image_paths = [os.path.join(self.nstemi_path, img_pth) for img_pth in os.listdir(self.nstemi_path)]
+        stemi_image_paths = [os.path.join(self.stemi_path, img_pth) for img_pth in os.listdir(self.stemi_path) if img_pth.endswith('.pdf')]
+        nstemi_image_paths = [os.path.join(self.nstemi_path, img_pth) for img_pth in os.listdir(self.nstemi_path) if img_pth.endswith('.pdf')]
         stemi_data_path = [os.path.join(self.stemi_data_path, os.path.splitext(os.path.basename(img_pth))[0] + '.pkl') for img_pth in stemi_image_paths]
         nstemi_data_path = [os.path.join(self.nstemi_data_path, os.path.splitext(os.path.basename(img_pth))[0] + '.pkl') for img_pth in nstemi_image_paths]
         
